@@ -69,23 +69,23 @@ seq = keras.Sequential(
     [
         keras.Input(
             shape=(60, 120, 60, 1)
-        ),  # Variable-length sequence of 40x40x1 frames
+        ), 
         layers.ConvLSTM2D(
-            filters=16, kernel_size=(3, 3), padding="same", return_sequences=True
+            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
-        # layers.ConvLSTM2D(
-        #    filters=16, kernel_size=(3, 3), padding="same", return_sequences=True
-        # ),
-        # layers.BatchNormalization(),
-        # layers.ConvLSTM2D(
-        #    filters=16, kernel_size=(3, 3), padding="same", return_sequences=True
-        # ),
-        # layers.BatchNormalization(),
         layers.ConvLSTM2D(
-            filters=16, kernel_size=(3, 3), padding="same", return_sequences=True
+           filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
-        #layers.BatchNormalization(),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+           filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
         layers.Flatten(),
         layers.Dense(2, activation="softmax")
     ]
@@ -111,13 +111,13 @@ train_x, train_y, test_x, test_y = dataset([corona,void])
 seq.fit(
     train_x,
     train_y,
-    batch_size=5,
-    epochs=5
+    batch_size=1,
+    epochs=20
 )
 
-#eval_y = seq.evaluate(test_x, test_y, batch_size=5)
-#print(eval_y)
-
-eval_y = seq.predict(test_x)
-print(train_x.shape, test_x.shape)
+eval_y = seq.evaluate(test_x, test_y, batch_size=5)
 print(eval_y)
+
+# eval_y = seq.predict(test_x)
+# print(train_x.shape, test_x.shape)
+# print(eval_y)
