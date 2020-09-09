@@ -8,17 +8,9 @@ cwd = os.getcwd()
 data_folder_path = cwd + "/npy/"
 
 corona = np.load(data_folder_path + "Corona.npy")
-floating = np.load(data_folder_path + "floating.npy")
-noise = np.load(data_folder_path + "Noise.npy")
-particle = np.load(data_folder_path + "particle.npy")
-surface = np.load(data_folder_path + "Surface.npy")
 void = np.load(data_folder_path + "Void.npy")
 
 print("corona", corona.shape)
-print("floating", floating.shape)
-print("noise", noise.shape)
-print("particle", particle.shape)
-print("surface", surface.shape)
 print("void", void.shape)
 
 def dataset(npy_list, num=80):
@@ -45,8 +37,8 @@ def dataset(npy_list, num=80):
 
     print(train_x.shape)
     print(test_x.shape)
-    train_x = train_x.reshape(-1, 60, 120, 60, 1).astype('float32')
-    test_x = test_x.reshape(-1, 60, 120, 60, 1).astype('float32')
+    train_x = train_x.reshape(-1, 60, 128, 60, 1).astype('float32')
+    test_x = test_x.reshape(-1, 60, 128, 60, 1).astype('float32')
     #train_x = train_x / 255.0
     #test_x = test_x / 255.0
     train_y = tf.keras.utils.to_categorical(train_y, 2)
@@ -68,7 +60,7 @@ if gpus:
 seq = keras.Sequential(
     [
         keras.Input(
-            shape=(60, 120, 60, 1)
+            shape=(60, 128, 60, 1)
         ), 
         layers.ConvLSTM2D(
             filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
@@ -82,6 +74,13 @@ seq = keras.Sequential(
            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
         layers.ConvLSTM2D(
             filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
