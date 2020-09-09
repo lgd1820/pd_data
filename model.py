@@ -5,7 +5,7 @@ import numpy as np
 import os
 
 cwd = os.getcwd()
-data_folder_path = cwd + "\\npy\\"
+data_folder_path = cwd + "/npy/"
 
 corona = np.load(data_folder_path + "Corona.npy")
 floating = np.load(data_folder_path + "floating.npy")
