@@ -46,46 +46,58 @@ def dataset(npy_list, num=80):
 
     return train_x, train_y, test_x, test_y
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-  # 텐서플로가 첫 번째 GPU에 1GB 메모리만 할당하도록 제한
-  try:
-    tf.config.experimental.set_virtual_device_configuration(
-        gpus[0],
-        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024*6)])
-  except RuntimeError as e:
-    # 프로그램 시작시에 가상 장치가 설정되어야만 합니다
-    print(e)
-
 seq = keras.Sequential(
     [
         keras.Input(
             shape=(60, 128, 60, 1)
         ), 
         layers.ConvLSTM2D(
-            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
         layers.ConvLSTM2D(
-           filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+           filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
         layers.ConvLSTM2D(
-           filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+           filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
         layers.ConvLSTM2D(
-            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
         layers.ConvLSTM2D(
-            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.ConvLSTM2D(
-            filters=32, kernel_size=(3, 3), padding="same", return_sequences=True
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
+        ),
+        layers.BatchNormalization(),
+        layers.ConvLSTM2D(
+            filters=8, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
         layers.BatchNormalization(),
         layers.Flatten(),
+        #layers.Dropout(0.3),
+        #layers.Dense(1000, activation="softmax"),
+        layers.Dropout(0.3),
         layers.Dense(2, activation="softmax")
     ]
 )
@@ -101,8 +113,6 @@ seq.compile(loss="categorical_crossentropy", optimizer='adam',
         tf.keras.metrics.FalsePositives(name='fp'),
         tf.keras.metrics.FalseNegatives(name='fn'),])
 
-epochs = 1  # In practice, you would need hundreds of epochs.
-
 seq.summary()
 
 train_x, train_y, test_x, test_y = dataset([corona,void])
@@ -110,8 +120,8 @@ train_x, train_y, test_x, test_y = dataset([corona,void])
 seq.fit(
     train_x,
     train_y,
-    batch_size=1,
-    epochs=20
+    batch_size=4,
+    epochs=10
 )
 
 eval_y = seq.evaluate(test_x, test_y, batch_size=5)
