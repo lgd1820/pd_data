@@ -1,3 +1,8 @@
+'''
+작성일 : 2020-09-14
+작성자 : 이권동
+코드 개요 : ConvLSTM2D를 이용해 cnn으로 된 시계열 데이터를 학습하는 코드
+'''
 from tensorflow import keras
 from tensorflow.keras import layers
 import tensorflow as tf
@@ -13,6 +18,13 @@ void = np.load(data_folder_path + "Void.npy")
 print("corona", corona.shape)
 print("void", void.shape)
 
+'''
+    함수 개요 :
+        학습 데이터와 테스트 데이터를 split 하는 함수
+    매개변수 :
+        npy_list = npy 데이터의 리스트
+        num = 학습 데이터로 사용할 개수
+'''
 def dataset(npy_list, num=80):
     train_x = []
     train_y = []
@@ -46,6 +58,8 @@ def dataset(npy_list, num=80):
 
     return train_x, train_y, test_x, test_y
 
+# 학습 네트워크
+# 이부분은 계속 수정 중
 seq = keras.Sequential(
     [
         keras.Input(
