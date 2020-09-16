@@ -5,7 +5,9 @@
 '''
 from tensorflow import keras
 from tensorflow.keras import layers
+from sklearn.metrics import f1_score
 import tensorflow as tf
+import tensorflow_addons as tfa
 import numpy as np
 import os
 
@@ -120,27 +122,42 @@ seq = keras.Sequential(
 
 seq.compile(loss="categorical_crossentropy", optimizer='adam',
     metrics=['accuracy',
-        tf.keras.metrics.Precision(name='precision'),
-        tf.keras.metrics.Recall(name='recall'),
         tf.keras.metrics.TruePositives(name='tp'),
         tf.keras.metrics.TrueNegatives(name='tn'),
         tf.keras.metrics.FalsePositives(name='fp'),
-        tf.keras.metrics.FalseNegatives(name='fn'),])
+        tf.keras.metrics.FalseNegatives(name='fn'),
+        tfa.metrics.F1Score(num_classes=2, average=None)])
 
 seq.summary()
 
 train_x, train_y, test_x, test_y = dataset([corona,void])
-
 seq.fit(
     train_x,
     train_y,
     batch_size=4,
-    epochs=10
+    epochs=20
 )
 
 eval_y = seq.evaluate(test_x, test_y, batch_size=5)
 print(eval_y)
 
-# eval_y = seq.predict(test_x)
-# print(train_x.shape, test_x.shape)
-# print(eval_y)
+eval_y = seq.predict(test_x)
+
+np.save("eval_y.npy",eval_y)
+
+
+y_true = np.array([])
+for i in test_y:
+    if i[0] > i[1]:
+        y_true = np.append(y_true, 0)
+    else:
+        y_true = np.append(y_true, 1)
+
+y_pred = np.array([])
+for i in eval_y:
+    if i[0] > i[1]:
+        y_pred = np.append(y_pred, 0)
+    else:
+        y_pred = np.append(y_pred, 1)
+
+print(f1_score(y_true, y_pred, average='macro'))
