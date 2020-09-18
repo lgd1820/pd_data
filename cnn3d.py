@@ -10,14 +10,6 @@ import tensorflow as tf
 import numpy as np
 import os
 
-data_folder_path = "./npy/"
-
-corona = np.load(data_folder_path + "Corona.npy")
-void = np.load(data_folder_path + "Void.npy")
-
-print("corona", corona.shape)
-print("void", void.shape)
-
 '''
     함수 개요 :
         학습 데이터와 테스트 데이터를 split 하는 함수
@@ -94,7 +86,9 @@ seq.compile(loss="categorical_crossentropy", optimizer='adam',
 
 seq.summary()
 
-train_x, train_y, test_x, test_y = dataset([corona,void])
+dataset = np.load('./shuffle/' + sys.argv[1] + '.npz')
+
+train_x, train_y, test_x, test_y = dataset["train_x"], dataset["train_y"], dataset["test_x"], dataset["test_y"]
 
 seq.fit(
     train_x,
@@ -106,25 +100,9 @@ seq.fit(
 eval_y = seq.evaluate(test_x, test_y, batch_size=5)
 print(eval_y)
 
-'''
-eval_y = seq.predict(test_x)
+line = str(eval_y[0]) + "," + str(eval_y[1]) + "," + str(sum(eval_y[6])/2) + "\n"
+#line = str(train_val[0]) + "," + str(train_val[1]) + "," + str(sum(train_val[6])/2) + \
 
-np.save("eval_y.npy",eval_y)
-
-y_true = np.array([])
-for i in test_y:
-    if i[0] > i[1]:
-        y_true = np.append(y_true, 0)
-    else:
-        y_true = np.append(y_true, 1)
-
-y_pred = np.array([])
-for i in eval_y:
-    if i[0] > i[1]:
-        y_pred = np.append(y_pred, 0)
-    else:
-        y_pred = np.append(y_pred, 1)
-
-print(f1_score(y_true, y_pred, average='macro'))
-'''
+with open('acc', "a") as f:
+    f.write(line)
 

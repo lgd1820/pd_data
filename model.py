@@ -93,14 +93,21 @@ dataset = np.load('./shuffle/' + sys.argv[1] + '.npz')
 
 train_x, train_y, test_x, test_y = dataset["train_x"], dataset["train_y"], dataset["test_x"], dataset["test_y"]
 
-seq.fit(
+train_val = seq.fit(
     train_x,
     train_y,
     batch_size=2,
-    epochs=20
+    epochs=1
 )
 
+print(train_val)
+
 eval_y = seq.evaluate(test_x, test_y, batch_size=5)
-print(eval_y)
+
+line = str(eval_y[0]) + "," + str(eval_y[1]) + "," + str(sum(eval_y[6])/2) + "\n"
+#line = str(train_val[0]) + "," + str(train_val[1]) + "," + str(sum(train_val[6])/2) + \
+
+with open('acc', "a") as f:
+    f.write(line)
 
 
