@@ -5,12 +5,18 @@
 '''
 from tensorflow import keras
 from tensorflow.keras import layers
-from sklearn.metrics import f1_score
-import tensorflow as tf
 import tensorflow_addons as tfa
+import tensorflow as tf
 import numpy as np
 import os
-import sys
+
+data_folder_path = "./npy/"
+
+corona = np.load(data_folder_path + "Corona.npy")
+void = np.load(data_folder_path + "Void.npy")
+
+print("corona", corona.shape)
+print("void", void.shape)
 
 '''
     함수 개요 :
@@ -58,21 +64,20 @@ seq = keras.Sequential(
     [
         keras.Input(
             shape=(60, 128, 60, 1)
-        ), 
-        layers.ConvLSTM2D(
-            filters=16, kernel_size=(3, 3), padding="same", return_sequences=True
         ),
-        layers.BatchNormalization(),
+        layers.Conv3D(16, kernel_size=3, strides=1, padding='same', activation='relu'),
         layers.MaxPool3D(pool_size=(2, 2, 1), padding='same', data_format='channels_first'),
-        layers.ConvLSTM2D(
-            filters=16, kernel_size=(3, 3), padding="same", return_sequences=True
-        ),
-        layers.BatchNormalization(),
+        layers.Conv3D(16, kernel_size=3, strides=1, padding='same', activation='relu'),
         layers.MaxPool3D(pool_size=(2, 2, 1), padding='same', data_format='channels_first'),
+        layers.Conv3D(16, kernel_size=3, strides=1, padding='same', activation='relu'),
+        layers.MaxPool3D(pool_size=(2, 2, 1), padding='same', data_format='channels_first'),
+        layers.Conv3D(16, kernel_size=3, strides=1, padding='same', activation='relu'),
+        layers.MaxPool3D(pool_size=(2, 2, 1), padding='same', data_format='channels_first'),
+
         layers.Flatten(),
-        layers.Dropout(0.1),
-        layers.Dense(1000, activation="softmax"),
-        layers.Dropout(0.1),
+        layers.Dropout(0.3),
+        layers.Dense(1000, activation="relu"),
+        layers.Dropout(0.3),
         layers.Dense(2, activation="softmax")
     ]
 )
@@ -89,18 +94,37 @@ seq.compile(loss="categorical_crossentropy", optimizer='adam',
 
 seq.summary()
 
-dataset = np.load('./shuffle/' + sys.argv[1] + '.npz')
-
-train_x, train_y, test_x, test_y = dataset["train_x"], dataset["train_y"], dataset["test_x"], dataset["test_y"]
+train_x, train_y, test_x, test_y = dataset([corona,void])
 
 seq.fit(
     train_x,
     train_y,
-    batch_size=2,
+    batch_size=4,
     epochs=20
 )
 
 eval_y = seq.evaluate(test_x, test_y, batch_size=5)
 print(eval_y)
 
+'''
+eval_y = seq.predict(test_x)
+
+np.save("eval_y.npy",eval_y)
+
+y_true = np.array([])
+for i in test_y:
+    if i[0] > i[1]:
+        y_true = np.append(y_true, 0)
+    else:
+        y_true = np.append(y_true, 1)
+
+y_pred = np.array([])
+for i in eval_y:
+    if i[0] > i[1]:
+        y_pred = np.append(y_pred, 0)
+    else:
+        y_pred = np.append(y_pred, 1)
+
+print(f1_score(y_true, y_pred, average='macro'))
+'''
 
