@@ -5,12 +5,8 @@
 '''
 import os
 import numpy as np
-import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.pyplot as plt
 
-cwd = os.getcwd()
-data_folder_path = cwd + "./data/"
+data_folder_path = "./data/"
 
 data_folder_list = os.listdir(data_folder_path)
 l = []
@@ -39,4 +35,4 @@ for data_folder in data_folder_list:
             data_npy.append(l)
     data_npy = np.array(data_npy)
     print(data_npy.shape)
-    np.save(cwd + "/npy/" + data_folder, data_npy)
+    np.save("./npy/" + data_folder, data_npy)
